@@ -1,0 +1,16 @@
+{
+  "name": "jobportal",
+  "main": "src/worker.js",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/img/*", "/sitemap.xml"]
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "jobportal-db", "database_id": "এখানে-D1-database-id-বসান" }
+  ],
+  "r2_buckets": [
+    { "binding": "BUCKET", "bucket_name": "jobportal-images" }
+  ]
+}
