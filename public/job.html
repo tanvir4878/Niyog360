@@ -1,10 +1,10 @@
-<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0e7673">
 <title>চাকরির বিজ্ঞপ্তি</title><meta name="description" content="চাকরির বিস্তারিত বিজ্ঞপ্তি">
-<link rel="icon" href="/favicon.svg"><link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@600;800&display=swap" rel="stylesheet">
+<link rel="icon" href="/favicon.svg"><link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css"><script src="/common.js"></script></head><body>
-<header class="top"><div class="wrap bar"><a class="logo" href="/">💼 চাকরির খবর</a><a class="ib" href="/" style="margin-left:auto">← সব চাকরি</a><button id="theme" class="ib">🌙</button></div></header>
-<div class="wrap" id="job"><div class="sk" style="margin-top:16px"></div></div>
-<footer>© চাকরির খবর — আবেদনের আগে অবশ্যই মূল সার্কুলার যাচাই করুন।</footer>
+<header class="top"><div class="wrap bar"><a class="logo" href="/">💼 চাকরির<b>খবর</b></a><span class="spacer"></span><a class="ib" href="/">← সব চাকরি</a><button id="theme" class="ib">🌙</button></div></header>
+<div class="wrap" id="job"><div class="sk" style="margin-top:16px;height:420px"></div></div>
+<footer><b>💼 চাকরির খবর</b><br>আবেদনের আগে অবশ্যই মূল সার্কুলার যাচাই করুন।</footer>
 <div id="vw" class="vw" hidden>
  <div class="vbar"><span id="vc"></span><div><button data-z="-">－</button><button data-z="+">＋</button><button data-z="0" title="রিসেট">⟲</button><a id="vd" target="_blank" rel="noopener" download>⬇</a><button id="vx">✕</button></div></div>
  <div id="vs" class="vstage"><img id="vi" draggable="false" alt=""></div>
@@ -13,39 +13,57 @@
 <script>
 const id=new URLSearchParams(location.search).get('id');
 const fmt=t=>esc(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener nofollow">$1</a>');
-let J={};
-function render(j){J=j;const c=catOf(j.category),d=left(j.deadline),url=location.href;
+let tm;
+function render(j){const c=catOf(j.category),url=location.href,imgs=j.circular_images||[];
+ const G=imgs.length?imgs:(j.image_url?[j.image_url]:[]);
  document.title=j.title+' | চাকরির খবর';
  const ds=`${j.org?j.org+' — ':''}${j.title}। পদসংখ্যা: ${j.vacancies||'উল্লেখ নেই'}। শেষ তারিখ: ${j.deadline?bnDate(j.deadline):'উল্লেখ নেই'}`;
  document.querySelector('meta[name=description]').content=ds;
  const ld=document.createElement('script');ld.type='application/ld+json';
  ld.textContent=JSON.stringify({'@context':'https://schema.org','@type':'JobPosting',title:j.title,description:j.description||j.title,datePosted:j.created_at.slice(0,10),validThrough:j.deadline||undefined,hiringOrganization:{'@type':'Organization',name:j.org||'—'},jobLocation:{'@type':'Place',address:{'@type':'PostalAddress',addressLocality:j.location||'Bangladesh',addressCountry:'BD'}},url});
  document.head.appendChild(ld);
- const facts=[['👥','পদসংখ্যা',j.vacancies],['📍','কর্মস্থল',j.location],['💰','বেতন',j.salary],['🎓','শিক্ষাগত যোগ্যতা',j.education],['🧰','অভিজ্ঞতা',j.experience],['🎂','বয়সসীমা',j.age_limit],['📅','আবেদনের শেষ তারিখ',j.deadline?bnDate(j.deadline)+' ('+d.txt+')':'']].filter(f=>f[2]);
- const imgs=j.circular_images||[];
+ const d=left(j.deadline);
+ const facts=[['👥 পদসংখ্যা',j.vacancies],['📍 কর্মস্থল',j.location],['💰 বেতন',j.salary],['🎓 শিক্ষাগত যোগ্যতা',j.education],['🧰 অভিজ্ঞতা',j.experience],['🎂 বয়সসীমা',j.age_limit],['📅 প্রকাশ',bnDate(j.created_at.slice(0,10))],['⏰ শেষ তারিখ',j.deadline?bnDate(j.deadline):'']].filter(f=>f[1]);
  const apply=j.apply_url?`<a class="btn pri big" href="${esc(j.apply_url)}" target="_blank" rel="noopener nofollow">✅ আবেদন করুন ↗</a>`:'';
- $('#job').innerHTML=`<article>
- <div class="dh"><div class="cv">${j.image_url?`<img src="${esc(j.image_url)}" alt="${esc(j.title)}">`:c[2]}</div>
- <div class="in"><div class="bg">${j.urgent?'<i class="u">জরুরি</i>':''}${j.featured?'<i class="f">⭐ ফিচার্ড</i>':''}<i>${c[2]} ${c[1]}</i><i class="${d.cls}">⏳ ${d.txt}</i><i>👁 ${bn(j.views)}</i></div>
- <h1>${esc(j.title)}</h1><p class="org">🏢 ${esc(j.org)||'—'}</p>
- <div class="act">${apply}<button class="btn" id="sv"></button><button class="btn" onclick="print()">🖨️ প্রিন্ট</button></div></div></div>
- <div class="facts">${facts.map(f=>`<div><small>${f[0]} ${f[1]}</small><b>${esc(f[2])}</b></div>`).join('')}</div>
- ${j.description?`<section class="box"><h2>বিস্তারিত বিবরণ</h2><div class="txt">${fmt(j.description)}</div></section>`:''}
- ${j.how_to_apply?`<section class="box"><h2>আবেদনের নিয়ম</h2><div class="txt">${fmt(j.how_to_apply)}</div></section>`:''}
- ${imgs.length?`<section class="box"><h2>📄 মূল সার্কুলারের ছবি</h2><p class="org">ছবিতে ক্লিক করুন — জুম ইন/আউট ও ডাউনলোড করা যাবে</p><div class="gal">${imgs.map((s,i)=>`<img loading="lazy" src="${esc(s)}" data-i="${i}" alt="সার্কুলার ${bn(i+1)}">`).join('')}</div></section>`:''}
- <section class="box" id="share"><h2>শেয়ার করুন</h2><div class="act" style="margin:0">
- <a class="btn" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(j.title+' '+url)}">WhatsApp</a>
- <a class="btn" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}">Facebook</a>
- <button class="btn" id="cp">🔗 লিংক কপি</button></div></section>
- <section id="related"></section></article>
+ $('#job').innerHTML=`<div class="crumb"><a href="/">হোম</a> › <a href="/?cat=${j.category}">${c[1]}</a> › ${esc(j.title).slice(0,50)}…</div>
+ <article class="pd">
+  <div class="pg2"><div class="gm" id="gm">${G.length?`<img id="gi" src="${esc(G[0])}" alt="${esc(j.title)}"><span>🔍 জুম করতে ক্লিক করুন${G.length>1?' • '+bn(G.length)+'টি ছবি':''}</span>`:c[2]}</div>
+   ${G.length>1?`<div class="thumbs" id="gt">${G.map((s,i)=>`<img src="${esc(s)}" data-i="${i}" class="${i?'':'on'}" alt="">`).join('')}</div>`:''}</div>
+  <div class="pi">
+   <div class="bg">${j.urgent?'<i class="u">জরুরি</i>':''}${j.featured?'<i class="f">⭐ ফিচার্ড</i>':''}<i>${c[2]} ${c[1]}</i><i class="${d.cls}">⏳ ${d.txt}</i><i>👁 ${bn(j.views)}</i></div>
+   <h1>${esc(j.title)}</h1>
+   <div class="lg">${j.image_url&&imgs.length?`<img src="${esc(j.image_url)}" alt="">`:''}<span>🏢 ${esc(j.org)||'—'}</span></div>
+   ${j.deadline&&d.days>=0?`<div class="cd ${d.days<=3?'hot':''}" id="cd"><div><b id="c1">০</b><small>দিন</small></div><div><b id="c2">০</b><small>ঘণ্টা</small></div><div><b id="c3">০</b><small>মিনিট</small></div><div><b id="c4">০</b><small>সেকেন্ড</small></div></div>`:j.deadline?`<div class="cdm exp">⌛ আবেদনের মেয়াদ শেষ হয়েছে</div>`:''}
+   <div class="fl2">${facts.map(f=>`<div><small>${f[0]}</small><b>${esc(f[1])}</b></div>`).join('')}</div>
+   <div class="act">${apply}<button class="btn" id="sv"></button><button class="btn" onclick="print()">🖨️ প্রিন্ট</button></div>
+  </div>
+ </article>
+ ${j.description?`<section class="box"><h2>📋 বিস্তারিত বিবরণ</h2><div class="txt">${fmt(j.description)}</div></section>`:''}
+ ${j.how_to_apply?`<section class="box"><h2>📝 আবেদনের নিয়ম</h2><div class="txt">${fmt(j.how_to_apply)}</div></section>`:''}
+ ${imgs.length?`<section class="box"><h2>📄 মূল সার্কুলারের ছবি</h2><p class="org">ছবিতে ক্লিক করুন — জুম ইন/আউট, ড্র্যাগ ও ডাউনলোড করা যাবে</p><div class="gal">${imgs.map((s,i)=>`<div data-i="${i}"><img loading="lazy" src="${esc(s)}" alt="সার্কুলার ${bn(i+1)}"><span>🔍 ${bn(i+1)}/${bn(imgs.length)}</span></div>`).join('')}</div></section>`:''}
+ <section class="box" id="agechk"><h2>🎂 বয়স যাচাই (Age Calculator)</h2><p class="org">${j.age_limit?'বয়সসীমা: <b>'+esc(j.age_limit)+'</b> — ':''}আপনার জন্ম তারিখ দিয়ে দেখুন আপনি যোগ্য কি না।</p>
+  <div class="fg"><label>আপনার জন্ম তারিখ<input type="date" id="dob" class="inp"></label><label>বয়স গণনার তারিখ<input type="date" id="rf" class="inp"></label></div><div id="ageout"></div></section>
+ <section class="box" id="share"><h2>📤 শেয়ার করুন</h2><div class="act" style="margin:0">
+  <a class="btn" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(j.title+' '+url)}">WhatsApp</a>
+  <a class="btn" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}">Facebook</a>
+  <button class="btn" id="cp">🔗 লিংক কপি</button></div></section>
+ <section id="related"></section>
  <div class="sticky">${apply||''}<button class="btn" id="sv2"></button></div>`;
- const svt=()=>{const t=Saved.has(j.id)?'🔖 সেভ করা হয়েছে':'🔖 সেভ করুন';$('#sv').textContent=t;$('#sv2').textContent=Saved.has(j.id)?'🔖 সেভড':'🔖 সেভ'};svt();
+ /* save */
+ const svt=()=>{$('#sv').textContent=Saved.has(j.id)?'🔖 সেভ করা হয়েছে':'🔖 সেভ করুন';$('#sv2').textContent=Saved.has(j.id)?'🔖 সেভড':'🔖 সেভ'};svt();
  $('#sv').onclick=$('#sv2').onclick=()=>{Saved.toggle(j.id);svt()};
  $('#cp').onclick=async()=>{try{await navigator.clipboard.writeText(url);$('#cp').textContent='✅ কপি হয়েছে'}catch{prompt('লিংক কপি করুন',url)}};
- document.querySelectorAll('.gal img').forEach(im=>im.onclick=()=>openV(+im.dataset.i));
- if(j.image_url&&!imgs.length)document.querySelector('.cv img').style.cursor='zoom-in',document.querySelector('.cv img').onclick=()=>{V.list=[j.image_url];openV(0)};
- V.list=imgs;
- api('/api/jobs?limit=5&active=1&cat='+j.category).then(r=>{const it=r.items.filter(x=>x.id!==j.id).slice(0,4);if(it.length)$('#related').innerHTML=`<div class="box"><h2>আরও ${c[1]}</h2>${it.map(x=>`<p style="margin:6px 0"><a href="/job?id=${x.id}">📌 ${esc(x.title)}</a> <small class="org">— ${esc(x.org)}</small></p>`).join('')}</div>`}).catch(()=>{});
+ /* gallery */
+ V.list=G;
+ if($('#gi'))$('#gm').onclick=()=>openV(+($('#gi').dataset.i||0));
+ if($('#gt'))$('#gt').onclick=e=>{const im=e.target.closest('img');if(!im)return;$('#gi').src=G[+im.dataset.i];$('#gi').dataset.i=im.dataset.i;document.querySelectorAll('#gt img').forEach(x=>x.classList.toggle('on',x===im))};
+ document.querySelectorAll('.gal div').forEach(el=>el.onclick=()=>openV(+el.dataset.i));
+ /* countdown */
+ if($('#cd')){const end=new Date(j.deadline+'T23:59:59');const tick=()=>{let s=Math.max(0,Math.floor((end-Date.now())/1e3));$('#c1').textContent=bn(Math.floor(s/86400));$('#c2').textContent=bn(Math.floor(s%86400/3600));$('#c3').textContent=bn(Math.floor(s%3600/60));$('#c4').textContent=bn(s%60)};tick();tm=setInterval(tick,1000)}
+ /* age check */
+ const lim=ageParse(j.age_limit);$('#rf').value=j.deadline&&d.days>=0?j.deadline:ymd(new Date());
+ const ac=()=>$('#ageout').innerHTML=ageHTML($('#dob').value,$('#rf').value,lim);$('#dob').oninput=$('#rf').oninput=ac;
+ api('/api/jobs?limit=6&active=1&cat='+j.category).then(r=>{const it=r.items.filter(x=>x.id!==j.id).slice(0,4);if(it.length)$('#related').innerHTML=`<div class="sec"><h2>আরও ${c[1]}</h2></div><div class="rail">${it.map(x=>{const dd=left(x.deadline);return `<a class="mc" href="/job?id=${x.id}"><div class="th">${x.image_url?`<img loading="lazy" src="${esc(x.image_url)}" alt="">`:`<span>${c[2]}</span>`}<span class="dl ${dd.cls}">⏳ ${dd.txt}</span></div><div class="bd"><h3>${esc(x.title)}</h3><p class="org">🏢 ${esc(x.org)||'—'}</p></div></a>`}).join('')}</div>`}).catch(()=>{});
 }
 /* ---------- Zoom viewer ---------- */
 const V={i:0,s:1,x:0,y:0,list:[]},vi=$('#vi'),vs=$('#vs'),P=new Map();let d0=0,s0=1;
