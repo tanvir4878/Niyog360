@@ -73,7 +73,9 @@ export default {
       }
       if (p === '/api/admin/login' && m === 'POST') {
         const b = await req.json().catch(() => ({}));
-        if (!env.ADMIN_PASSWORD || b.password !== env.ADMIN_PASSWORD) { await new Promise(r => setTimeout(r, 800)); return J({ error: 'ভুল পাসওয়ার্ড' }, 401); }
+        const pw = String(env.ADMIN_PASSWORD || '').trim();
+        if (!pw) return J({ error: 'সার্ভারে ADMIN_PASSWORD পাওয়া যায়নি — Cloudflare এ Secret হিসেবে যোগ করে Redeploy করুন' }, 500);
+        if (String(b.password || '').trim() !== pw) { await new Promise(r => setTimeout(r, 800)); return J({ error: 'ভুল পাসওয়ার্ড' }, 401); }
         const e = Date.now() + 6048e5;
         return J({ token: e + '.' + await sign(env, String(e)) });
       }
