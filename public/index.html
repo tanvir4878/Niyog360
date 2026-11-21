@@ -1,0 +1,53 @@
+<!doctype html><html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>চাকরির খবর — সরকারি, ব্যাংক, এনজিও ও সকল চাকরির সর্বশেষ বিজ্ঞপ্তি</title>
+<meta name="description" content="সরকারি, ব্যাংক, এনজিও, প্রাইভেট সহ সকল চাকরির সর্বশেষ সার্কুলার, সার্কুলারের ছবি ও অনলাইনে আবেদনের লিংক এক জায়গায়।">
+<link rel="icon" href="/favicon.svg"><link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css"><script src="/common.js"></script></head><body>
+<header class="top"><div class="wrap bar"><a class="logo" href="/">💼 চাকরির খবর</a>
+<span class="spacer"></span>
+<button id="saved" class="ib" title="সেভ করা চাকরি">🔖<b id="sc">0</b></button><button id="theme" class="ib">🌙</button></div></header>
+<section class="hero"><div class="wrap"><span class="pill">✨ বিশ্বস্ত চাকরির বিজ্ঞপ্তি পোর্টাল</span>
+<h1>স্বপ্নের চাকরি খুঁজুন <em>এক ক্লিকেই</em></h1>
+<p>সরকারি, ব্যাংক, এনজিও ও প্রাইভেট — সব সর্বশেষ সার্কুলার, মূল ছবি ও আবেদনের লিংক এক জায়গায়।</p>
+<form id="sf" class="search"><input id="q" placeholder="চাকরি বা প্রতিষ্ঠান খুঁজুন…"><button>🔍 খুঁজুন</button></form>
+<div class="hs"><div><b id="ht">০</b><small>চলমান বিজ্ঞপ্তি</small></div><div><b>৯টি</b><small>ক্যাটাগরি</small></div><div><b>প্রতিদিন</b><small>নতুন আপডেট</small></div></div></div></section>
+<div class="wrap">
+<div class="masthead"><small id="ed"></small><h2>চাকরির বিজ্ঞপ্তি — আজকের সংস্করণ</h2></div>
+<div class="ticker"><b>📢 সর্বশেষ</b><div class="tkw"><div class="tk" id="tk"></div></div></div>
+<nav class="chips" id="chips"></nav>
+<div class="tools"><span id="rc"></span><label><input type="checkbox" id="ac" checked> শুধু চলমান বিজ্ঞপ্তি</label>
+<select id="so"><option value="">সর্বশেষ আগে</option><option value="deadline">শেষ তারিখ কাছে</option><option value="views">সবচেয়ে জনপ্রিয়</option></select></div>
+<main id="grid" class="grid"></main><nav id="pg" class="pager"></nav></div>
+<footer><b style="color:#fff">💼 চাকরির খবর</b><br>আবেদনের আগে অবশ্যই মূল সার্কুলার যাচাই করুন।<br><small>© সর্বস্বত্ব সংরক্ষিত</small></footer>
+<script>
+const S={cat:'',q:'',page:1,sort:'',all:0,saved:0};let ST={};
+function readURL(){const p=new URLSearchParams(location.search);Object.assign(S,{cat:p.get('cat')||'',q:p.get('q')||'',page:+p.get('page')||1,sort:p.get('sort')||'',all:+!!p.get('all'),saved:+!!p.get('saved')});$('#q').value=S.q;$('#so').value=S.sort;$('#ac').checked=!S.all}
+function go(ch,keep){Object.assign(S,ch);if(!keep)S.page=1;const p=new URLSearchParams();for(const k in S)if(S[k]&&!(k==='page'&&S.page===1))p.set(k,S[k]);history.pushState(null,'','?'+p);load();scrollTo({top:0,behavior:'smooth'})}
+function card(j,i){const d=left(j.deadline),c=catOf(j.category);
+return `<a class="card ${i===0&&S.page===1&&!S.saved?'lead':''}" href="/job?id=${j.id}"><div class="th">${j.image_url?`<img loading="lazy" src="${esc(j.image_url)}" alt="">`:`<span>${c[2]}</span>`}</div><div class="bd"><div class="bg">${j.urgent?'<i class="u">জরুরি</i>':''}${j.featured?'<i class="f">⭐ ফিচার্ড</i>':''}${isNew(j.created_at)?'<i class="n">নতুন</i>':''}<i>${c[1]}</i></div><h3>${esc(j.title)}</h3><p class="org">${esc(j.org)}</p><div class="mt"><span>👥 ${esc(j.vacancies||'—')}</span><span class="${d.cls}">⏳ ${d.txt}</span></div></div></a>`}
+function pager(p,t){if(t<=1)return'';const s=[...new Set([1,t,p-1,p,p+1])].filter(n=>n>=1&&n<=t).sort((a,b)=>a-b);let h=`<button ${p<2?'disabled':''} data-p="${p-1}">‹ আগের</button>`,l=0;s.forEach(n=>{if(n-l>1)h+='<span>…</span>';h+=`<button class="${n===p?'on':''}" data-p="${n}">${bn(n)}</button>`;l=n});return h+`<button ${p>=t?'disabled':''} data-p="${p+1}">পরের ›</button><small>পৃষ্ঠা ${bn(p)} / ${bn(t)}</small>`}
+function chips(){const t=Object.values(ST).reduce((a,b)=>a+b,0);$('#ht').textContent=bn(t);$('#chips').innerHTML=`<button class="${!S.cat&&!S.saved?'on':''}" data-c="">🏠 সব <em>${bn(t)}</em></button>`+CATS.map(c=>`<button class="${S.cat===c[0]?'on':''}" data-c="${c[0]}">${c[2]} ${c[1]} <em>${bn(ST[c[0]]||0)}</em></button>`).join('')}
+async function load(){
+ $('#grid').innerHTML='<div class="sk"></div>'.repeat(6);
+ const p=new URLSearchParams({page:S.page,limit:11});
+ if(S.cat)p.set('cat',S.cat);if(S.q)p.set('q',S.q);if(S.sort)p.set('sort',S.sort);if(!S.all&&!S.saved)p.set('active',1);if(S.saved)p.set('ids',Saved.get().join(','));
+ try{const r=await api('/api/jobs?'+p);
+  $('#rc').textContent=(S.saved?'🔖 সেভ করা: ':'মোট ')+bn(r.total)+'টি বিজ্ঞপ্তি';
+  $('#grid').innerHTML=r.items.length?r.items.map(card).join(''):'<p class="empty">কোনো বিজ্ঞপ্তি পাওয়া যায়নি।</p>';
+  $('#pg').innerHTML=pager(r.page,r.pages);
+ }catch(e){$('#grid').innerHTML=`<p class="empty">${esc(e.message)}</p>`}
+ chips();$('#sc').textContent=bn(Saved.get().length);
+}
+$('#ed').textContent=new Date().toLocaleDateString('bn-BD',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+$('#sf').onsubmit=e=>{e.preventDefault();go({q:$('#q').value.trim(),saved:0})};
+$('#so').onchange=e=>go({sort:e.target.value});
+$('#ac').onchange=e=>go({all:e.target.checked?0:1});
+$('#saved').onclick=()=>go({saved:S.saved?0:1,cat:''});
+$('#chips').onclick=e=>{const b=e.target.closest('button');if(b)go({cat:b.dataset.c,saved:0})};
+$('#pg').onclick=e=>{const b=e.target.closest('button[data-p]');if(b&&!b.disabled)go({page:+b.dataset.p},true)};
+addEventListener('popstate',()=>{readURL();load()});
+readURL();
+api('/api/stats').then(s=>{ST=s.cats;chips()}).catch(()=>{});
+api('/api/jobs?limit=10&active=1').then(r=>{const h=r.items.map(j=>`<a href="/job?id=${j.id}">📌 ${esc(j.title)}</a>`).join('');$('#tk').innerHTML=h+h;if(!r.items.length)$('.ticker').hidden=true}).catch(()=>{$('.ticker').hidden=true});
+load();
+</script></body></html>
