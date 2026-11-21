@@ -11,7 +11,7 @@
     {
       "binding": "DB",
       "database_name": "jobportal-db",
-      "database_id": "PASTE-YOUR-D1-DATABASE-ID-HERE"
+      "database_id": "234fa8b2-d392-4132-867c-4581b431e042"
     }
   ],
   "r2_buckets": [
